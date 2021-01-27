@@ -1,0 +1,9 @@
+---
+debug: false
+server:
+  token: T0kEn_
+  port: 8080
+urls:
+  - https://spark.adobe.com/version
+  - https://qa.adobeprojectm.com/version
+#  - https://qa.adobeprojectm.com/version
