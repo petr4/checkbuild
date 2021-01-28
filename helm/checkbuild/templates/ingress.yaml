@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.image.name }}-{{ .Values.image.tag }}
+  annotations:
+      kubernetes.io/tls-acme: "true"
+  labels:
+    app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+    versiontag: {{ .Values.image.tag }}
+  namespace: {{ .Values.namespace }}
+spec:
+  rules:
+{{- if ne .Values.namespace "prod" }}
+  - host: {{ .Values.image.name }}-{{ .Values.image.tag }}-{{ .Values.namespace }}.{{ .Values.ingressUrl }}
+{{- else }}
+  - host: {{ .Values.image.name }}.{{ .Values.ingressUrl }}
+{{- end }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.image.name }}-{{ .Values.image.tag }}
+          servicePort: {{ .Values.service.externalPort }}

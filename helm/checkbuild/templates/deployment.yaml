@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+    versiontag: {{ .Values.image.tag }}
+  annotations:
+    deployTime: "{{ now }}"
+  name: {{ .Values.image.name }}-{{ .Values.image.tag }}
+  namespace: {{ .Values.namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+        version: ""
+    spec:
+      containers:
+      - name: {{ .Values.image.name }}-{{ .Values.image.tag }}
+        image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: DEPLOYTIME
+          value: "{{ date "20060102150405" .Release.Time }}"
+        ports:
+        - name: http
+          containerPort: {{.Values.service.internalPort}}
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}

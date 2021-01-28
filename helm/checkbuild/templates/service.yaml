@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.image.name }}-{{ .Values.image.tag }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+    versiontag: {{ .Values.image.tag }}
+spec:
+  sessionAffinity: None
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.externalPort }}
+      protocol: TCP
+      targetPort: {{ .Values.service.internalPort }}
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app: {{ .Values.image.name }}-{{ .Values.image.tag }}
+    version: ""
