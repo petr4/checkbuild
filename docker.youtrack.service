@@ -1,0 +1,16 @@
+[Unit]
+Description=YouTrack Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker kill ch
+ExecStart=/usr/bin/docker run --rm --name ch \
+    -v /root/checkbuild/checkbuild.yaml:/app/checkbuild.yaml \
+    -p 8888:8080 \
+    docker.example.com/checkbuild:v1000 server
+
+[Install]
+WantedBy=default.target

@@ -13,7 +13,7 @@ import (
 
 var (
 	// Used for flags.
-	cfgFile     string
+	CfgFile     string
 	logFile     string
 	userLicense string
 	urls        []string
@@ -78,12 +78,14 @@ func Execute() error {
 }
 
 func init() {
-	logrus.Warnf("Using config file: %v", cfgFile)
+	logrus.Warnf("Using config file: %v", CfgFile)
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.checkbuild.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&CfgFile, "config", "c", "", "config file (default is $HOME/checkbuild.yaml)")
 	rootCmd.Flags().StringVar(&logFile, "logfile", "", "log file (default is Stdout")
 	rootCmd.Flags().StringSliceVarP(&urls, "urls", "u", []string{"https://qa.adobeprojectm.com/version", "https://spark.adobe.com/version"}, "Add urls, separated by ','; urls >=2")
 	// rootCmd.MarkFlagRequired("urls")
+	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
+	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	rootCmd.Flags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	logrus.SetFormatter(&logrus.TextFormatter{
 		DisableColors: false,
@@ -99,9 +101,9 @@ func er(msg interface{}) {
 }
 
 func initConfig() {
-	if cfgFile != "" {
+	if CfgFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(CfgFile)
 	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
@@ -111,7 +113,7 @@ func initConfig() {
 
 		// Search config in home directory with name "checkbuild" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName("checkbuild.yaml")
+		viper.SetConfigName("checkbuild")
 	}
 
 	viper.AutomaticEnv()
